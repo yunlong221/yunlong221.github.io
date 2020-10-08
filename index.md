@@ -1,3 +1,4 @@
 # 随便整点......
 ## 校园点滴
 <img src="https://github.com/yunlong221/yunlong221.github.io/blob/main/picture/1.jpg">
+<img src="https://github.com/yunlong221/yunlong221.github.io/blob/main/picture/2.jpg">
