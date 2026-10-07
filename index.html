@@ -1,33 +1,319 @@
-<html lang="zh-cn">
- <head>
-   <meta charset="utf-8"/>
-   <title>最初のページ</title>
-  <link href="style.css" rel="stylesheet" type="text/css"/>
- </head>
-  <body>
-   <center><h1>第一次做，随便整点</h1>
-    
-    <h2>个人简介</h2>
-    <p>姓刘，名云龙，来自河北邢台，毕业于河北枣强中学，现就读于北京大学药学院，喜欢音乐，最近喜欢打原神。（就不爆照了）</center>
-     
-    <h2>校园点滴</h2>
-    <img src="picture/1.jpg" height="600" width="800">
-    <img src="picture/2.jpg" height="600" width="1000">
-   <p id="p1">（左：新生训练营；右：军训四营十三连二班）</p>
-    <h2>关于音乐</h2>
-     <p>本人比较喜欢欧美音乐（姆爷，烟鬼，教主等），华语（慢节奏，古风）和日语（G团，各种番的歌等）的也有涉猎，纯音乐也听过不少，喜欢音乐的可以加我QQ(980632183)交流一下</p>
-   <h2>其他</h2>
-   
-   <h3>电影</h3>
-   <p>平时看电影也不多，没有什么特别喜欢的，漫威，喜剧，科幻都喜欢看，不喜欢言情，恐怖片，有新电影通常会去电影院体验一把，有想去电影院没人的可以call我</P>
- <center><img src="picture/4.jpg"></center>
-   
- <h3>动漫</h3>
- <p>从小到大也没看过啥动漫，就是电视播啥看啥，大学前也就看过ONE PIECE，现在准备入坑，有好看的番推荐一下啊</p>
- 
- <h3>游戏</h3>
- <p>红警，从小到大一直玩的游戏，玩过各种MOD，尝试过许多非官方地图、任务，如果有还在玩的小伙伴联系我</p>
- <p>其他还有GTA，星际争霸，原神等，比较喜欢剧情类和休闲的</p>
- <center><h4>最后插入一个舍友的链接</h4>
-<a href="https://letianwang666.github.io/" >点此进入</a></center>
- </body>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>麻将NG卡</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Microsoft YaHei', sans-serif;
+  background: #1a1a2e;
+  color: #eee;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  user-select: none;
+}
+h1 { margin: 18px 0 10px; font-size: 1.6em; letter-spacing: 4px; }
+.controls {
+  display: flex; gap: 12px; align-items: center;
+  margin-bottom: 14px; flex-wrap: wrap; justify-content: center;
+}
+.controls label { font-size: 0.9em; color: #aaa; }
+.controls select, .controls button {
+  padding: 6px 14px; border-radius: 6px; border: 1px solid #444;
+  background: #16213e; color: #eee; font-size: 0.9em; cursor: pointer;
+}
+.controls button:hover { background: #0f3460; }
+.controls button.primary { background: #e94560; border-color: #e94560; font-weight: bold; }
+.controls button.primary:hover { background: #c73650; }
+
+.cross-layout {
+  display: grid;
+  grid-template-areas:
+    ".    south   ."
+    "west center  east"
+    ".    north   .";
+  grid-template-columns: 220px 200px 220px;
+  grid-template-rows: 260px 200px 260px;
+  gap: 10px;
+  margin: 10px auto;
+}
+.center-area {
+  grid-area: center;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 10px;
+}
+.draw-btn {
+  padding: 14px 32px; font-size: 1.2em; font-weight: bold;
+  background: linear-gradient(135deg, #e94560, #c73650);
+  color: #fff; border: none; border-radius: 12px;
+  cursor: pointer; box-shadow: 0 4px 15px rgba(233,69,96,0.4);
+  transition: transform 0.15s;
+}
+.draw-btn:hover { transform: scale(1.05); }
+.draw-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.draw-info { font-size: 0.8em; color: #888; text-align: center; }
+
+.player-card {
+  background: #16213e;
+  border: 2px solid #333;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex; flex-direction: column;
+  align-items: center;
+  transition: border-color 0.3s;
+}
+.player-card.self { border-color: #e94560; }
+.player-card .direction-label {
+  font-size: 0.75em; color: #888; margin-bottom: 2px;
+}
+.player-card .direction-name {
+  font-size: 1.3em; font-weight: bold; margin-bottom: 6px;
+}
+.player-card .name-input {
+  background: transparent; border: 1px dashed #555; border-radius: 4px;
+  color: #eee; text-align: center; padding: 3px 8px; font-size: 0.95em;
+  width: 120px; margin-bottom: 8px;
+}
+.player-card .name-input:focus { border-color: #e94560; outline: none; }
+.ng-cards {
+  display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+  min-height: 60px;
+}
+.ng-tag {
+  padding: 4px 10px; border-radius: 16px; font-size: 0.82em;
+  cursor: default; transition: background 0.2s;
+}
+.ng-tag.pool1 { background: #0f3460; border: 1px solid #1a5276; }
+.ng-tag.pool2 { background: #5b2c6f; border: 1px solid #7d3c98; }
+.ng-tag.hidden-card {
+  background: #333; border: 1px dashed #555; color: #666;
+  font-style: italic;
+}
+.player-card.north { grid-area: north; }
+.player-card.south { grid-area: south; }
+.player-card.east  { grid-area: east; }
+.player-card.west  { grid-area: west; }
+
+.pool-legend {
+  display: flex; gap: 16px; margin-top: 8px; font-size: 0.78em; color: #888;
+}
+.pool-legend span { display: flex; align-items: center; gap: 4px; }
+.pool-legend .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.pool-legend .dot.p1 { background: #0f3460; }
+.pool-legend .dot.p2 { background: #5b2c6f; }
+
+.history {
+  margin: 16px 0 30px; width: 90%; max-width: 700px;
+}
+.history h3 {
+  font-size: 0.95em; color: #888; margin-bottom: 8px;
+  cursor: pointer; display: flex; align-items: center; gap: 6px;
+}
+.history h3::before {
+  content: '▶'; font-size: 0.7em; transition: transform 0.2s;
+}
+.history.open h3::before { transform: rotate(90deg); }
+.history-list {
+  max-height: 0; overflow: hidden; font-size: 0.82em;
+  background: #0d1117; border-radius: 8px; padding: 0 10px;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+}
+.history.open .history-list {
+  max-height: 300px; overflow-y: auto; padding: 10px;
+}
+.history-item { padding: 4px 0; border-bottom: 1px solid #1a1a2e; }
+.history-item:last-child { border: none; }
+.history-item .round { color: #e94560; font-weight: bold; margin-right: 6px; }
+</style>
+</head>
+<body>
+
+<h1>麻将 NG 卡</h1>
+
+<div class="controls">
+  <label>我的方位：</label>
+  <select id="selfSelect">
+    <option value="east">东</option>
+    <option value="south">南</option>
+    <option value="west">西</option>
+    <option value="north">北</option>
+  </select>
+  <button class="primary" id="drawBtn" onclick="drawCards()">抽签</button>
+  <button onclick="resetAll()">重置</button>
+</div>
+
+<div class="cross-layout">
+  <div class="player-card north" id="card-north">
+    <div class="direction-label">方位</div>
+    <div class="direction-name">北</div>
+    <input class="name-input" placeholder="输入名字" data-dir="north">
+    <div class="ng-cards" id="ng-north"></div>
+  </div>
+  <div class="player-card west" id="card-west">
+    <div class="direction-label">方位</div>
+    <div class="direction-name">西</div>
+    <input class="name-input" placeholder="输入名字" data-dir="west">
+    <div class="ng-cards" id="ng-west"></div>
+  </div>
+  <div class="center-area">
+    <button class="draw-btn" id="drawBtnCenter" onclick="drawCards()">抽 签</button>
+    <div class="draw-info" id="drawInfo">点击抽签，每人获得两张NG卡</div>
+    <div class="pool-legend">
+      <span><span class="dot p1"></span> 卡池1</span>
+      <span><span class="dot p2"></span> 卡池2</span>
+    </div>
+  </div>
+  <div class="player-card east" id="card-east">
+    <div class="direction-label">方位</div>
+    <div class="direction-name">东</div>
+    <input class="name-input" placeholder="输入名字" data-dir="east">
+    <div class="ng-cards" id="ng-east"></div>
+  </div>
+  <div class="player-card south" id="card-south">
+    <div class="direction-label">方位</div>
+    <div class="direction-name">南</div>
+    <input class="name-input" placeholder="输入名字" data-dir="south">
+    <div class="ng-cards" id="ng-south"></div>
+  </div>
+</div>
+
+<div class="history" id="historySection">
+  <h3 onclick="document.getElementById('historySection').classList.toggle('open')">抽签历史</h3>
+  <div class="history-list" id="historyList">
+    <div style="color:#555;">暂无记录</div>
+  </div>
+</div>
+
+<script>
+const POOL1 = ['立直','立直','平和','平和','断幺','断幺','役牌','役牌','默听','默听',
+               '七对子','混一色','奇数番','偶数番','自摸','荣和','满贯','跳满'];
+const POOL2 = ['立直','立直','平和','平和','断幺','断幺','役牌','役牌','默听','默听','副露','副露',
+               '奇数番','偶数番','自摸','荣和','跳满','倍满'];
+
+const DIRS = ['east','south','west','north'];
+const DIR_LABELS = { east:'东', south:'南', west:'西', north:'北' };
+
+let state = {
+  selfDir: 'east',
+  names: { east:'', south:'', west:'', north:'' },
+  cards: { east:[], south:[], west:[], north:[] },
+  round: 0,
+  history: []
+};
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function drawFromPool(pool) {
+  const shuffled = shuffle(pool);
+  return shuffled.slice(0, 4);
+}
+
+function drawCards() {
+  const drawn1 = drawFromPool(POOL1);
+  const drawn2 = drawFromPool(POOL2);
+  state.round++;
+
+  const result = {};
+  DIRS.forEach((dir, i) => {
+    state.cards[dir] = [
+      { text: drawn1[i], pool: 1 },
+      { text: drawn2[i], pool: 2 }
+    ];
+    result[dir] = state.cards[dir].map(c => c.text);
+  });
+
+  const names = {};
+  DIRS.forEach(d => names[d] = state.names[d] || DIR_LABELS[d]);
+  state.history.unshift({ round: state.round, result, names: {...names} });
+
+  render();
+  document.getElementById('drawInfo').textContent = `第 ${state.round} 轮抽签完成`;
+}
+
+function resetAll() {
+  state.cards = { east:[], south:[], west:[], north:[] };
+  state.round = 0;
+  state.history = [];
+  document.getElementById('drawInfo').textContent = '点击抽签，每人获得两张NG卡';
+  render();
+}
+
+function render() {
+  const self = state.selfDir;
+
+  DIRS.forEach(dir => {
+    const card = document.getElementById('card-' + dir);
+    const container = document.getElementById('ng-' + dir);
+    const isSelf = dir === self;
+
+    card.classList.toggle('self', isSelf);
+
+    container.innerHTML = '';
+    if (state.cards[dir].length === 0) {
+      container.innerHTML = '<span style="color:#555;font-size:0.8em;">等待抽签...</span>';
+    } else if (isSelf) {
+      state.cards[dir].forEach(() => {
+        const tag = document.createElement('span');
+        tag.className = 'ng-tag hidden-card';
+        tag.textContent = '???';
+        container.appendChild(tag);
+      });
+    } else {
+      state.cards[dir].forEach(c => {
+        const tag = document.createElement('span');
+        tag.className = 'ng-tag pool' + c.pool;
+        tag.textContent = c.text;
+        container.appendChild(tag);
+      });
+    }
+  });
+
+  renderHistory();
+}
+
+function renderHistory() {
+  const el = document.getElementById('historyList');
+  if (state.history.length === 0) {
+    el.innerHTML = '<div style="color:#555;">暂无记录</div>';
+    return;
+  }
+  el.innerHTML = state.history.map(h => {
+    const parts = DIRS.map(d => {
+      const name = h.names[d] || DIR_LABELS[d];
+      const cards = h.result[d].join('、');
+      return `${name}: ${cards}`;
+    });
+    return `<div class="history-item"><span class="round">第${h.round}轮</span>${parts.join(' | ')}</div>`;
+  }).join('');
+}
+
+document.getElementById('selfSelect').addEventListener('change', function() {
+  state.selfDir = this.value;
+  render();
+});
+
+document.querySelectorAll('.name-input').forEach(input => {
+  input.addEventListener('input', function() {
+    const dir = this.dataset.dir;
+    state.names[dir] = this.value;
+    const card = document.getElementById('card-' + dir);
+    card.querySelector('.direction-name').textContent = this.value || DIR_LABELS[dir];
+  });
+});
+
+render();
+</script>
+</body>
+</html>
